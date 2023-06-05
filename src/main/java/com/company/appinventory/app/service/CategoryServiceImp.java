@@ -65,4 +65,31 @@ public class CategoryServiceImp implements CategoryService {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Override
+    @Transactional
+    public ResponseEntity<CategoryResponseRest> saveCategory(Category category) {
+        CategoryResponseRest response = new CategoryResponseRest();
+        List<Category> categoryList = new ArrayList<>();
+
+        try {
+            Category categorySaved = repository.save(category);
+
+            if (categorySaved != null) {
+                categoryList.add(categorySaved);
+                response.getCategoryResponse().setCategories(categoryList);
+                response.setMetadata("Successful response", "00", LocalDateTime.now());
+            } else {
+                response.getCategoryResponse().setCategories(null);
+                response.setMetadata("Failed response", "-1", LocalDateTime.now());
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            response.setMetadata("Failed response", "-1", LocalDateTime.now());
+            e.printStackTrace();
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
