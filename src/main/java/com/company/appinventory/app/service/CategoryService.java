@@ -8,4 +8,5 @@ public interface CategoryService {
     ResponseEntity<CategoryResponseRest> search();
     ResponseEntity<CategoryResponseRest> searchById(Long id);
     ResponseEntity<CategoryResponseRest> saveCategory(Category category);
+    ResponseEntity<CategoryResponseRest> updateCategory(Category category, Long id);
 }

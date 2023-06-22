@@ -3,9 +3,12 @@ package com.company.appinventory.app.controller;
 import com.company.appinventory.app.model.Category;
 import com.company.appinventory.app.response.CategoryResponseRest;
 import com.company.appinventory.app.service.CategoryService;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -35,6 +38,13 @@ public class CategoryController {
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<CategoryResponseRest> saveCategory(@RequestBody Category category) {
         ResponseEntity<CategoryResponseRest> response = service.saveCategory(category);
+        return response;
+    }
+
+    @RequestMapping(path = "/categories/{id}", method = RequestMethod.PUT, consumes = {APPLICATION_JSON_VALUE},
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<CategoryResponseRest> updateCategory(@RequestBody Category category, @PathVariable Long id) {
+        ResponseEntity<CategoryResponseRest> response = service.updateCategory(category, id);
         return response;
     }
 }

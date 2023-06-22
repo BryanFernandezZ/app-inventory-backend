@@ -21,12 +21,13 @@ public class ResponseRest {
         return metadata;
     }
 
-    public void setMetadata(String type, String code, LocalDateTime date) {
+    public void setMetadata(String type, String code, LocalDateTime date, String message) {
         Map<String, String> map = new HashMap<>();
 
         map.put("type", type);
         map.put("code", code);
         map.put("date", date.toString());
+        map.put("message", message);
 
         metadata.add(map);
     }

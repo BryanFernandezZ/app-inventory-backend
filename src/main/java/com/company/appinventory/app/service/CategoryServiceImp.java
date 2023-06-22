@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 public class CategoryServiceImp implements CategoryService {
 
-    private CategoryRepository repository;
+    private final CategoryRepository repository;
 
     public CategoryServiceImp(CategoryRepository repository) {
         this.repository = repository;
@@ -30,9 +30,9 @@ public class CategoryServiceImp implements CategoryService {
         try {
             List<Category> categories = repository.findAll();
             response.getCategoryResponse().setCategories(categories);
-            response.setMetadata("Successful response", "00", LocalDateTime.now());
+            response.setMetadata("Successful response", "00", LocalDateTime.now(), "Categorias encontradas");
         } catch (Exception e) {
-            response.setMetadata("Failed response", "-1", LocalDateTime.now());
+            response.setMetadata("Failed response", "-1", LocalDateTime.now(), "Error al buscar las categorias");
             e.printStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -51,14 +51,14 @@ public class CategoryServiceImp implements CategoryService {
             if (category.isPresent()) {
                 categoryList.add(category.get());
                 response.getCategoryResponse().setCategories(categoryList);
-                response.setMetadata("Successful response", "00", LocalDateTime.now());
+                response.setMetadata("Successful response", "00", LocalDateTime.now(), "Categoria encontrada");
             } else {
                 response.getCategoryResponse().setCategories(null);
-                response.setMetadata("Empty response", "-1", LocalDateTime.now());
+                response.setMetadata("Empty response", "-1", LocalDateTime.now(), "La categoria no existe");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            response.setMetadata("Failed response", "-1", LocalDateTime.now());
+            response.setMetadata("Failed response", "-1", LocalDateTime.now(), "Error al buscar la categoria");
             e.printStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -78,14 +78,53 @@ public class CategoryServiceImp implements CategoryService {
             if (categorySaved != null) {
                 categoryList.add(categorySaved);
                 response.getCategoryResponse().setCategories(categoryList);
-                response.setMetadata("Successful response", "00", LocalDateTime.now());
+                response.setMetadata("Successful response", "00", LocalDateTime.now(), "Categoria guardada");
             } else {
                 response.getCategoryResponse().setCategories(null);
-                response.setMetadata("Failed response", "-1", LocalDateTime.now());
+                response.setMetadata("Bad response", "-1", LocalDateTime.now(), "Categoria no guardada");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            response.setMetadata("Failed response", "-1", LocalDateTime.now());
+            response.setMetadata("Failed response", "-1", LocalDateTime.now(), "Error al guardar categoria");
+            e.printStackTrace();
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<CategoryResponseRest> updateCategory(Category category, Long id) {
+        CategoryResponseRest response = new CategoryResponseRest();
+        List<Category> categoryList = new ArrayList<>();
+
+        try {
+            Optional<Category> categorySearch = repository.findById(id);
+
+            if (categorySearch.isPresent()) {
+                //TODO: SE PROCEDERA A ACTUALIZAR LA CATEGORIA
+                categorySearch.get().setName(category.getName());
+                categorySearch.get().setDescription(category.getDescription());
+
+                Category categoryToUpdate = repository.saveAndFlush(categorySearch.get());
+
+                if (categoryToUpdate != null) {
+                    categoryList.add(categoryToUpdate);
+                    response.getCategoryResponse().setCategories(categoryList);
+                    response.setMetadata("Successful response", "00", LocalDateTime.now(), "Categoria actualizada");
+                } else {
+                    response.setMetadata("Failed response", "-1", LocalDateTime.now(), "Categoria no actualizada");
+                    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                response.getCategoryResponse().setCategories(null);
+                response.setMetadata("Empty response", "-1", LocalDateTime.now(), "Categoria no encontrada");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            response.setMetadata("Failed response", "-1", LocalDateTime.now(), "Error al actualizar categoria");
             e.printStackTrace();
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
